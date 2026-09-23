@@ -8,65 +8,17 @@ import { useRouter } from "next/navigation"
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js"
 
 const labs = [
-  {
-    id: 1,
-    title: "Parola Kirici",
-    description: "MD5 hash kirilarak gizli sifre bulunacak. Terminal ve hash kirma araclarini kullanmayi ogren!",
-    category: "Kriptografi",
-    difficulty: "Kolay",
-    points: 100,
-    solvers: 1247,
-    estimatedTime: "15 dk",
-    icon: Lock,
-    color: "from-green-500 to-emerald-500",
-    tags: ["MD5", "Hash Cracking", "Terminal"],
-    isActive: true,
-  },
-  {
-    id: 2,
-    title: "Ag Analizi",
-    description: "Wireshark benzeri arayuzde ag trafiigini analiz et, supheli aktiviteleri tespit et!",
-    category: "Ag Guvenligi",
-    difficulty: "Orta",
-    points: 150,
-    solvers: 856,
-    estimatedTime: "20 dk",
-    icon: Globe,
-    color: "from-cyber-blue to-blue-500",
-    tags: ["Wireshark", "Packet Analysis", "DNS"],
-    isActive: true,
-  },
-  {
-    id: 3,
-    title: "SQL Injection",
-    description: "Savunmasiz bir web uygulamasina SQL injection saldirisi yaparak gizli verilere eris!",
-    category: "Web Guvenligi",
-    difficulty: "Orta",
-    points: 200,
-    solvers: 623,
-    estimatedTime: "25 dk",
-    icon: Database,
-    color: "from-cyber-purple to-violet-500",
-    tags: ["SQL", "Injection", "UNION Attack"],
-    isActive: true,
-  },
-  {
-    id: 4,
-    title: "Linux Privilege Escalation",
-    description: "Dusuk yetkili kullanicidan SUID exploit ile root erisimi kazan!",
-    category: "Sistem Guvenligi",
-    difficulty: "Zor",
-    points: 300,
-    solvers: 234,
-    estimatedTime: "30 dk",
-    icon: Server,
-    color: "from-red-500 to-orange-500",
-    tags: ["Linux", "SUID", "Root"],
-    isActive: true,
-  },
+  { id: 1, title: "Tersine Çevir", description: "Kodlanmış mesajı doğru sıraya getir ve ilk flagini yakala.", category: "Encoding", difficulty: "Kolay", points: 100, solvers: 1247, estimatedTime: "10 dk", icon: Lock, color: "from-green-500 to-emerald-500", tags: ["Encoding", "String", "Terminal"], isActive: true },
+  { id: 2, title: "HTML Yorum", description: "Bir web sayfasının kaynak kodunda saklanan gizli yorumu keşfet.", category: "Web", difficulty: "Kolay", points: 100, solvers: 980, estimatedTime: "10 dk", icon: Globe, color: "from-cyan-500 to-blue-500", tags: ["HTML", "Source Code", "Recon"], isActive: true },
+  { id: 3, title: "Sayıların Dili", description: "A=1 eşleşmesini kullanarak sayısal mesajı okunabilir bir flage dönüştür.", category: "Kriptografi", difficulty: "Orta", points: 150, solvers: 856, estimatedTime: "15 dk", icon: Lock, color: "from-blue-500 to-indigo-500", tags: ["A1Z26", "Crypto", "Decode"], isActive: true },
+  { id: 4, title: "Paket İzleri", description: "Şüpheli ağ isteğini analiz et ve saldırganın bıraktığı izi bul.", category: "Adli Bilişim", difficulty: "Orta", points: 200, solvers: 623, estimatedTime: "20 dk", icon: Globe, color: "from-cyber-blue to-blue-500", tags: ["HTTP", "PCAP", "Analysis"], isActive: true },
+  { id: 5, title: "Yetki Merdiveni", description: "Yanlış yapılandırılmış dosya izinlerini analiz ederek yetki yükseltme yolunu bul.", category: "Linux", difficulty: "Zor", points: 250, solvers: 412, estimatedTime: "25 dk", icon: Server, color: "from-orange-500 to-red-500", tags: ["Linux", "SUID", "Permissions"], isActive: true },
+  { id: 6, title: "SQL Sızıntısı", description: "Girdi doğrulaması eksik web uygulamasındaki veri sızıntısını tespit et.", category: "Web", difficulty: "Zor", points: 300, solvers: 234, estimatedTime: "30 dk", icon: Database, color: "from-cyber-purple to-violet-500", tags: ["SQL", "Injection", "Validation"], isActive: true },
+  { id: 7, title: "Assembly Kapısı", description: "CMP ve JNE talimatlarını takip ederek programın kontrol akışını çöz.", category: "Reverse Engineering", difficulty: "Uzman", points: 400, solvers: 118, estimatedTime: "40 dk", icon: Terminal, color: "from-fuchsia-500 to-purple-600", tags: ["Assembly", "GDB", "Reverse"], isActive: true },
+  { id: 8, title: "Bulut İzi", description: "Kimlik doğrulama sınırlarını incele ve açık metadata erişimini güvenli hale getir.", category: "Cloud", difficulty: "Uzman", points: 500, solvers: 76, estimatedTime: "45 dk", icon: Zap, color: "from-pink-500 to-rose-600", tags: ["Metadata", "IAM", "Cloud"], isActive: true },
 ]
 
-const categories = ["Tümü", "Kriptografi", "Ağ Güvenliği", "Web Güvenliği", "Sistem Güvenliği"]
+const categories = ["Tümü", "Encoding", "Web", "Kriptografi", "Adli Bilişim", "Linux", "Reverse Engineering", "Cloud"]
 
 interface LabsShowcaseProps {
   onOpenTerminal?: () => void
@@ -257,8 +209,13 @@ export function LabsShowcase({ onOpenTerminal, onOpenPasswordLab, onOpenNetworkL
                       )}
                     </Button>
                   ) : (
-                    <Button size="sm" variant="ghost" className="text-muted-foreground cursor-not-allowed" disabled>
-                      Yakinda
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => document.getElementById("ctf-challenge")?.scrollIntoView({ behavior: "smooth" })}
+                      className="border-cyber-blue/40 text-cyber-blue hover:bg-cyber-blue/10 font-semibold"
+                    >
+                      CTF&apos;de Çöz <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   )}
                 </div>
