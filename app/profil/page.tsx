@@ -29,6 +29,7 @@ interface Profile {
 export default function ProfilPage() {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
+  const [completedChallenges, setCompletedChallenges] = useState<Array<{ challenge_id: string; points: number; submitted_at: string; title: string; difficulty: string }>>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"genel" | "lablar" | "sertifikalar">("genel")
   const router = useRouter()
@@ -56,6 +57,30 @@ export default function ProfilPage() {
       
       if (profileData) {
         setProfile(profileData)
+      }
+
+      const { data: submissions } = await supabase
+        .from("ctf_submissions")
+        .select("challenge_id, points, submitted_at, ctf_challenges(title, difficulty)")
+        .eq("user_id", user.id)
+        .order("submitted_at", { ascending: false })
+
+      if (submissions) {
+        setCompletedChallenges(submissions.map((submission: {
+          challenge_id: string
+          points: number
+          submitted_at: string
+          ctf_challenges: { title: string; difficulty: string } | Array<{ title: string; difficulty: string }> | null
+        }) => {
+          const challenge = Array.isArray(submission.ctf_challenges) ? submission.ctf_challenges[0] : submission.ctf_challenges
+          return {
+            challenge_id: submission.challenge_id,
+            points: submission.points,
+            submitted_at: submission.submitted_at,
+            title: challenge?.title ?? submission.challenge_id,
+            difficulty: challenge?.difficulty ?? "CTF",
+          }
+        }))
       }
       
       setLoading(false)
@@ -288,29 +313,30 @@ export default function ProfilPage() {
                   Tamamlanan Lablar
                 </h3>
                 
-                {profile.completed_labs > 0 ? (
-                  <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/30">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-green to-emerald-500 flex items-center justify-center">
-                      <CheckCircle2 className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground">{profile.completed_labs} CTF labı</p>
-                      <p className="text-xs text-muted-foreground">Tamamlanan toplam lab</p>
-                    </div>
+                {completedChallenges.length > 0 ? (
+                  <div className="flex flex-col gap-3">
+                    {completedChallenges.map((challenge) => (
+                      <div key={challenge.challenge_id} className="flex items-center gap-4 p-4 rounded-lg bg-muted/30 border border-cyber-green/10">
+                        <div className="size-12 rounded-xl bg-gradient-to-br from-cyber-green to-emerald-500 flex items-center justify-center shrink-0">
+                          <CheckCircle2 className="size-6 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground truncate">{challenge.title}</p>
+                          <p className="text-xs text-muted-foreground">{challenge.difficulty} · {new Date(challenge.submitted_at).toLocaleDateString("tr-TR")}</p>
+                        </div>
+                        <span className="text-cyber-green font-semibold whitespace-nowrap">+{challenge.points} XP</span>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Terminal className="w-8 h-8 text-muted-foreground" />
+                    <div className="size-16 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Terminal className="size-8 text-muted-foreground" />
                     </div>
                     <h4 className="text-lg font-semibold text-foreground mb-2">Henuz Lab Tamamlanmadi</h4>
-                    <p className="text-muted-foreground mb-4">
-                      Ilk labini tamamla ve burada goruntule!
-                    </p>
-                    <Link href="/#lablar">
-                      <Button className="bg-gradient-to-r from-cyber-blue to-cyber-purple">
-                        Lablara Git
-                      </Button>
+                    <p className="text-muted-foreground mb-4">Ilk CTF labini tamamla ve puan geçmişini burada gör.</p>
+                    <Link href="/#ctf-challenge">
+                      <Button className="bg-gradient-to-r from-cyber-blue to-cyber-purple">CTF Alanına Git</Button>
                     </Link>
                   </div>
                 )}
