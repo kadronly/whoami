@@ -7,7 +7,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import type { User as SupabaseUser } from "@supabase/supabase-js"
+import type { AuthChangeEvent, Session, User as SupabaseUser } from "@supabase/supabase-js"
 
 interface Profile {
   is_admin: boolean
@@ -54,7 +54,7 @@ export function Navbar({ onOpenDemo }: NavbarProps) {
     checkUser()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
       setUser(session?.user ?? null)
       if (session?.user) {
         const { data: profile } = await supabase
