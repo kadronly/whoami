@@ -19,7 +19,7 @@ interface Profile {
   level: number
   xp: number
   badges: string[]
-  completed_labs: string[]
+  completed_labs: number
   certificates: string[]
   streak: number
   created_at: string
@@ -170,7 +170,7 @@ export default function ProfilPage() {
               </div>
               <div className="text-center p-3 rounded-xl bg-cyber-green/10 border border-cyber-green/20">
                 <CheckCircle2 className="w-5 h-5 text-cyber-green mx-auto mb-1" />
-                <p className="text-lg font-bold text-foreground">{profile.completed_labs?.length || 0}</p>
+                <p className="text-lg font-bold text-foreground">{profile.completed_labs || 0}</p>
                 <p className="text-xs text-muted-foreground">Lab</p>
               </div>
               <div className="text-center p-3 rounded-xl bg-cyber-blue/10 border border-cyber-blue/20">
@@ -220,7 +220,7 @@ export default function ProfilPage() {
                     Ilerleme Durumu
                   </h3>
                   
-                  {profile.completed_labs?.length > 0 || profile.badges?.length > 0 ? (
+                  {profile.completed_labs > 0 || profile.badges?.length > 0 ? (
                     <div className="space-y-4">
                       <p className="text-muted-foreground">
                         Siber guvenlik yolculugunda ilerliyorsun! Lablar tamamlayarak ve rozetler kazanarak deneyim puani kazan.
@@ -288,19 +288,15 @@ export default function ProfilPage() {
                   Tamamlanan Lablar
                 </h3>
                 
-                {profile.completed_labs?.length > 0 ? (
-                  <div className="space-y-3">
-                    {profile.completed_labs.map((lab, idx) => (
-                      <div key={idx} className="flex items-center gap-4 p-4 rounded-lg bg-muted/30">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-green to-emerald-500 flex items-center justify-center">
-                          <CheckCircle2 className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground">{lab}</p>
-                          <p className="text-xs text-muted-foreground">Tamamlandi</p>
-                        </div>
-                      </div>
-                    ))}
+                {profile.completed_labs > 0 ? (
+                  <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/30">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-green to-emerald-500 flex items-center justify-center">
+                      <CheckCircle2 className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{profile.completed_labs} CTF labı</p>
+                      <p className="text-xs text-muted-foreground">Tamamlanan toplam lab</p>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-8">
