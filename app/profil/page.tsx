@@ -66,7 +66,12 @@ export default function ProfilPage() {
         .order("submitted_at", { ascending: false })
 
       if (submissions) {
-        setCompletedChallenges(submissions.map((submission) => {
+        setCompletedChallenges(submissions.map((submission: {
+          challenge_id: string
+          points: number
+          submitted_at: string
+          ctf_challenges: { title: string; difficulty: string } | Array<{ title: string; difficulty: string }> | null
+        }) => {
           const challenge = Array.isArray(submission.ctf_challenges) ? submission.ctf_challenges[0] : submission.ctf_challenges
           return {
             challenge_id: submission.challenge_id,
